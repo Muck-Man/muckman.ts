@@ -1,10 +1,9 @@
-import { Structures } from 'detritus-client';
+import {
+  Constants,
+  Structures,
+} from 'detritus-client';
 
-import { Constants as SocketConstants } from 'detritus-client-socket';
-const {
-  GatewayPresenceStatuses: PresenceStatuses,
-  GatewayPresenceTypes: PresenceTypes,
-} = SocketConstants;
+const { ActivityTypes, PresenceStatuses } = Constants;
 
 
 import { analyzeMuck } from './api';
@@ -22,7 +21,7 @@ const muckMan = new MuckMan({
     presence: {
       activity: {
         name: 'for muck',
-        type: PresenceTypes.WATCHING,
+        type: ActivityTypes.WATCHING,
       },
       status: PresenceStatuses.ONLINE,
     },
