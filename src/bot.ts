@@ -104,7 +104,7 @@ muckMan.on('COMMAND_RATELIMIT', async ({command, context, ratelimit, remaining})
         switch (command.ratelimit.type) {
           case 'channel':
           case 'guild': {
-            noun = 'You guys';
+            noun = "Y'all";
           }; break;
         }
       }
