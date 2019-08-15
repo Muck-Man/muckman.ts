@@ -253,10 +253,12 @@ export class Paginator {
     raw,
   }: GatewayClientEvents.MessageDelete) {
     if (this.message && this.message.id === raw.id) {
+      this.message = null;
       await this.onStop();
     }
     if (this.custom.message && this.custom.message.id === raw.id) {
       this.custom.message = null;
+      await this.clearCustomMessage();
     }
   }
 

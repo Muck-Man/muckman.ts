@@ -69,7 +69,7 @@ export default (<Command.CommandOptions> {
             }
             embed.addField('Status', status, true);
           }
-  
+
           if (presence.status in PresenceStatusColors) {
             embed.setColor(PresenceStatusColors[presence.status]);
           }
@@ -93,7 +93,7 @@ export default (<Command.CommandOptions> {
                       }
                     }
                   } catch(error) {
-  
+
                   }
                 }
               } else {
@@ -127,7 +127,7 @@ export default (<Command.CommandOptions> {
               }
               embed.addField(name, description.join('\n'), true);
             }
-  
+
             // now do the fields
             const thumbnail = activity.imageUrlFormat(null, {size: 1024});
             if (thumbnail) {
@@ -141,7 +141,7 @@ export default (<Command.CommandOptions> {
                 assets.smallImageUrl || undefined,
               );
             }
-  
+
             const timestamps = activity.timestamps;
             if (timestamps) {
               const elapsed = formatTime(Math.max(timestamps.elapsedTime, 0));
@@ -150,7 +150,7 @@ export default (<Command.CommandOptions> {
               const description = (timestamps.end) ? `${elapsed}/${total}` : `${elapsed}`;
               embed.addField('Time', description, true);
             }
-  
+
             if (activity.party) {
               const currentSize = activity.party.currentSize;
               const maxSize = activity.party.maxSize;
@@ -168,7 +168,7 @@ export default (<Command.CommandOptions> {
                 embed.addField('Party', description.join('\n'));
               }
             }
-  
+
             const application = activity.application;
             if (application) {
               const description = new Set();
@@ -187,7 +187,7 @@ export default (<Command.CommandOptions> {
                 embed.addField('Store Links', Array.from(description).join(', '), true);
               }
             }
-  
+
             if (activity.isOnSpotify) {
               const description = [];
               if (activity.details) {

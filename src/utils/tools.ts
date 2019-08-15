@@ -86,20 +86,25 @@ export async function findMembers(
 
 
 export interface FindMemberByUsernameCache {
-  find: (func: (member: Structures.Member) => boolean) => Structures.Member | undefined,
+  find: (func: (member: Structures.Member | Structures.User | undefined) => boolean) => Structures.Member | Structures.User | undefined,
 }
 
 export function findMemberByUsername(
   members: FindMemberByUsernameCache,
   username: string,
   discriminator?: null | string,
-): Structures.Member | undefined {
-  return members.find((member: Structures.Member) => {
-    const match = [member.nick, member.username].some((name) => {
-      return name && name.toLowerCase().startsWith(username);
-    });
-    if (match) {
-      return (discriminator) ? member.discriminator === discriminator : true;
+): Structures.Member | Structures.User | undefined {
+  return members.find((member) => {
+    if (member) {
+      const match = [
+        (member instanceof Structures.Member) ? member.nick : null,
+        member.username,
+      ].some((name) => {
+        return name && name.toLowerCase().startsWith(username);
+      });
+      if (match) {
+        return (discriminator) ? member.discriminator === discriminator : true;
+      }
     }
     return false;
   });

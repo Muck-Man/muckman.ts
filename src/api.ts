@@ -6,7 +6,7 @@ import {
 } from 'detritus-rest';
 
 
-export const TEMP_TOKEN = '';
+export const TEMP_TOKEN = 'MzAwNTA1MzY0MDMyMzg5MTIy.XU_mOA.zwDWhUxjOszZHnmQ5RPzcUT_LCQ';
 export const API_URL = 'https://muck.gg/api';
 
 export interface ApiRequestOptions extends RequestTypes.RequestOptions {

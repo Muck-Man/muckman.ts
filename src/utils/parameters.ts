@@ -16,6 +16,30 @@ import {
 } from './tools';
 
 
+export async function applications(
+  value: string,
+  context: Command.Context,
+): Promise<Array<Structures.Application> | undefined> {
+  value = value.trim().toLowerCase();
+  if (value) {
+    if (isSnowflake(value) && context.applications.has(value)) {
+      const application = <Structures.Application> context.applications.get(value);
+      return [application];
+    }
+    return context.applications.filter((application) => {
+      if (application.name.toLowerCase().startsWith(value)) {
+        return true;
+      }
+      if (application.aliases) {
+        return application.aliases.some((name) => {
+          return name.toLowerCase().startsWith(value);
+        });
+      }
+      return false;
+    });
+  }
+}
+
 export async function channel(
   value: string,
   context: Command.Context,
@@ -117,7 +141,7 @@ export async function memberOrUser(
         const messages = channel.messages;
         if (messages) {
           for (let [messageId, message] of messages) {
-            const members = [message.member, message.user].filter((v) => v);
+            const members = [message.member, message.author].filter((v) => v);
             if (members.length) {
               const found = findMemberByUsername(members, username, discriminator);
               if (found) {
