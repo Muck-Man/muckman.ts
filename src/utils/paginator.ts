@@ -428,7 +428,6 @@ export class Paginator {
         const func = this.callbacks[callback];
         if (func !== null) {
           this.context.client.addListener(callback, func);
-          this.callbacks[callback] = null;
         }
       }
 
