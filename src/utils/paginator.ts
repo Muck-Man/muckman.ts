@@ -18,12 +18,12 @@ export const MIN_PAGE = 1;
 export const PageEmojis = Object.freeze({
   custom: '🔢',
   info: 'ℹ',
-  next: '▶',
-  previous: '◀',
+  next: '➡',
+  nextDouble: '⏭',
+  previous: '⬅',
+  previousDouble: '⏮',
   stop: '⏹',
 });
-
-export const PageEmojisOrder = Object.freeze(['previous', 'next', 'custom', 'stop', 'info']);
 
 export type OnErrorCallback = (error: any, paginator: Paginator) => Promise<any> | any;
 export type OnExpireCallback = (paginator: Paginator) => Promise<any> | any;
@@ -44,6 +44,7 @@ export interface PaginatorOptions {
   message?: Structures.Message,
   page?: number,
   pageLimit?: number,
+  pageSkipAmount?: number,
   pages?: Array<Utils.Embed>,
   targets?: Array<Structures.Member | Structures.User | string>,
 
@@ -72,6 +73,7 @@ export class Paginator {
   message: null | Structures.Message = null;
   page: number = MIN_PAGE;
   pageLimit: number = MAX_PAGE;
+  pageSkipAmount: number = 10;
   pages?: Array<Utils.Embed>;
   stopped: boolean = false;
   targets: Array<string> = [];
@@ -101,6 +103,7 @@ export class Paginator {
     if (options.page !== undefined) {
       this.page = Math.max(MIN_PAGE, Math.min(options.page, MAX_PAGE));
     }
+    this.pageSkipAmount = Math.max(2, options.pageSkipAmount || this.pageSkipAmount);
 
     if (Array.isArray(options.targets)) {
       for (let target of options.targets) {
@@ -161,6 +164,10 @@ export class Paginator {
       onPage: {enumerable: false},
       onPageNumber: {enumerable: false},
     });
+  }
+
+  get isLarge(): boolean {
+    return this.pageSkipAmount < this.pageLimit;
   }
 
   addPage(embed: Utils.Embed): Paginator {
@@ -279,20 +286,34 @@ export class Paginator {
 
     try {
       switch (reaction.emoji.endpointFormat) {
-        case this.emojis.next.endpointFormat: {
-          const page = this.page + 1;
-          if (this.pageLimit < page) {
-            break;
+        case this.emojis.previousDouble.endpointFormat: {
+          if (!this.isLarge) {
+            return;
           }
+          const page = Math.max(this.page - this.pageSkipAmount, MIN_PAGE);
           await this.setPage(page);
         }; break;
         case this.emojis.previous.endpointFormat: {
           const page = this.page - 1;
-          if (page < MIN_PAGE) {
-            break;
+          if (MIN_PAGE <= page) {
+            await this.setPage(page);
           }
+        }; break;
+
+        case this.emojis.next.endpointFormat: {
+          const page = this.page + 1;
+          if (page <= this.pageLimit) {
+            await this.setPage(page);
+          }
+        }; break;
+        case this.emojis.nextDouble.endpointFormat: {
+          if (!this.isLarge) {
+            return;
+          }
+          const page = Math.min(this.page + this.pageSkipAmount, this.pageLimit);
           await this.setPage(page);
         }; break;
+
         case this.emojis.custom.endpointFormat: {
           if (!this.custom.message) {
             await this.clearCustomMessage();
@@ -408,13 +429,18 @@ export class Paginator {
       }
 
       this.timeout = setTimeout(this.onStop.bind(this), this.expires);
-
       try {
-        for (let key of PageEmojisOrder) {
-          if (key in this.emojis) {
-            await this.message.react(this.emojis[key].endpointFormat);
-          }
+        if (this.isLarge) {
+          await this.message.react(this.emojis.previousDouble.endpointFormat);
         }
+        await this.message.react(this.emojis.previous.endpointFormat);
+        await this.message.react(this.emojis.next.endpointFormat);
+        if (this.isLarge) {
+          await this.message.react(this.emojis.nextDouble.endpointFormat);
+        }
+        await this.message.react(this.emojis.custom.endpointFormat);
+        await this.message.react(this.emojis.stop.endpointFormat);
+        await this.message.react(this.emojis.info.endpointFormat);
       } catch(error) {
         if (typeof(this.onError) === 'function') {
           this.onError(error, this);
