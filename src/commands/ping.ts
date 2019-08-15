@@ -10,9 +10,9 @@ export default (<Command.CommandOptions> {
   },
   run: async (context) => {
     const {gateway, rest} = await context.client.ping();
-    return context.reply(`pong! (gateway: ${gateway}ms) (rest: ${rest}ms)`);
+    return context.editOrReply(`pong! (gateway: ${gateway}ms) (rest: ${rest}ms)`);
   },
   onRunError: (context, args, error) => {
-    return context.reply(`⚠ Error: ${error.message}`);
+    return context.editOrReply(`⚠ Error: ${error.message}`);
   },
 });

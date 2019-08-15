@@ -13,6 +13,7 @@ import { formatMuck } from './utils';
 
 
 const muckMan = new MuckMan({
+  activateOnEdits: true,
   cache: {
     members: {storeOffline: true},
   },

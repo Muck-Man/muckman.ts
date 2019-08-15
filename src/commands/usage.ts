@@ -28,7 +28,7 @@ export default (<Command.CommandOptions> {
       voiceConnections: context.voiceConnections.length,
       voiceStates: context.voiceStates.length,
     };
-    return context.reply([
+    return context.editOrReply([
       '```json',
       JSON.stringify(information, null, 2),
       '```',

@@ -25,9 +25,9 @@ export default (<Command.CommandOptions> {
     const channel = context.channel;
     return (channel) ? channel.canEmbedLinks : false;
   },
-  onCancel: (context) => context.reply('⚠ Unable to embed information in this channel.'),
+  onCancel: (context) => context.editOrReply('⚠ Unable to embed information in this channel.'),
   onBeforeRun: (context, args) => !!args.user,
-  onCancelRun: (context) => context.reply('⚠ Unable to find that guy.'),
+  onCancelRun: (context) => context.editOrReply('⚠ Unable to find that guy.'),
   run: async (context, args) => {
     let statsContext: Structures.Channel | Structures.Guild | undefined;
     let statsType = MuckStatTypes.GLOBAL;
@@ -53,7 +53,7 @@ export default (<Command.CommandOptions> {
       statsType,
       statsUser,
     });
-    return context.reply({embed});
+    return context.editOrReply({embed});
   },
   onError: (context, args, error) => {
     console.error(error);
@@ -80,7 +80,7 @@ export default (<Command.CommandOptions> {
       statsType,
       statsUser,
     });
-    return context.reply({embed});
+    return context.editOrReply({embed});
   },
   onTypeError: (context, error) => {
     console.error(error);

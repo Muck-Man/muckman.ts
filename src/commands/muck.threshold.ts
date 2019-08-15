@@ -23,7 +23,7 @@ export default (<Command.CommandOptions> {
     return value.trim().replace(/ /g, '_').toLowerCase();
   },
   run: async (context, args) => {
-    return context.reply('lmao u thought');
+    return context.editOrReply('lmao u thought');
   },
   onError: (context, args, error) => {
     console.error(error);

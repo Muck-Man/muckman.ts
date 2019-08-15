@@ -20,9 +20,9 @@ export default (<Command.CommandOptions> {
     const channel = context.channel;
     return (channel) ? channel.canEmbedLinks : false;
   },
-  onCancel: (context) => context.reply('⚠ Unable to embed information in this channel.'),
+  onCancel: (context) => context.editOrReply('⚠ Unable to embed information in this channel.'),
   onBeforeRun: (context, args) => !!args.content,
-  onCancelRun: (context) => context.reply('⚠ Provide some content to analyze.'),
+  onCancelRun: (context) => context.editOrReply('⚠ Provide some content to analyze.'),
   run: async (context, args) => {
     const muck = await analyzeMuck(context, {
       channelId: context.channelId,
@@ -34,7 +34,7 @@ export default (<Command.CommandOptions> {
       context,
       muck,
     });
-    return context.reply({embed});
+    return context.editOrReply({embed});
   },
   onError: (context, args, error) => {
     console.error(error);

@@ -19,7 +19,7 @@ export default (<Command.CommandOptions> {
     const channel = context.channel;
     return (channel) ? channel.canEmbedLinks : false;
   },
-  onCancel: (context) => context.reply('⚠ Unable to embed information in this channel.'),
+  onCancel: (context) => context.editOrReply('⚠ Unable to embed information in this channel.'),
   run: async (context, args) => {
     const stats = await fetchStatsGlobal(context);
     const embed = formatMuck(MuckContextTypes.GLOBAL, {
@@ -27,7 +27,7 @@ export default (<Command.CommandOptions> {
       context,
       stats,
     });
-    return context.reply({embed});
+    return context.editOrReply({embed});
   },
   onError: (context, args, error) => {
     console.error(error);

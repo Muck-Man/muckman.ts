@@ -21,9 +21,9 @@ export default (<Command.CommandOptions> {
     const channel = context.channel;
     return (channel) ? channel.canEmbedLinks : false;
   },
-  onCancel: (context) => context.reply('⚠ Unable to embed information in this channel.'),
+  onCancel: (context) => context.editOrReply('⚠ Unable to embed information in this channel.'),
   onBeforeRun: (context, args) => !!args.channel,
-  onCancelRun: (context) => context.reply('⚠ Unable to find that channel.'),
+  onCancelRun: (context) => context.editOrReply('⚠ Unable to find that channel.'),
   run: async (context, args) => {
     const stats = await fetchStatsChannel(context, args.channel.id);
     const embed = formatMuck(MuckContextTypes.CHANNEL, {
@@ -33,7 +33,7 @@ export default (<Command.CommandOptions> {
       statsContext: args.channel,
       statsType: MuckStatTypes.CHANNEL,
     });
-    return context.reply({embed});
+    return context.editOrReply({embed});
   },
   onError: (context, args, error) => {
     console.error(error);

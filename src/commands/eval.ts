@@ -54,7 +54,7 @@ export default (<Command.CommandOptions> {
           '```',
         ].join('\n');
       }
-      return context.reply(content);
+      return context.editOrReply(content);
     }
   },
   onError: (context, args, error) => {

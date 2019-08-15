@@ -5,6 +5,7 @@ import {
   Structures,
   Utils,
 } from 'detritus-client';
+import { Timers } from 'detritus-utils';
 
 const {
   ClientEvents,
@@ -60,12 +61,13 @@ export class Paginator {
   readonly custom: {
     expire: number,
     message?: null | Structures.Message,
-    timeout: any | null,
+    timeout: Timers.Timeout,
     userId?: null | string,
   } = {
     expire: 10000,
-    timeout: null,
+    timeout: new Timers.Timeout(),
   };
+  readonly timeout = new Timers.Timeout();
 
   emojis: {[key: string]: Structures.Emoji} = {};
   expires: number = 60000;
@@ -75,9 +77,10 @@ export class Paginator {
   pageLimit: number = MAX_PAGE;
   pageSkipAmount: number = 10;
   pages?: Array<Utils.Embed>;
+  ratelimit: number = 1500;
+  ratelimitTimeout = new Timers.Timeout();
   stopped: boolean = false;
   targets: Array<string> = [];
-  timeout?: any = null;
 
   onError?: OnErrorCallback;
   onExpire?: OnExpireCallback;
@@ -183,10 +186,7 @@ export class Paginator {
   }
 
   async clearCustomMessage(): Promise<void> {
-    if (this.custom.timeout !== null) {
-      clearTimeout(this.custom.timeout);
-      this.custom.timeout = null;
-    }
+    this.custom.timeout.stop();
     if (this.custom.message) {
       try {
         await this.custom.message.delete();
@@ -283,6 +283,9 @@ export class Paginator {
     if (!this.targets.includes(userId) && !this.context.client.isOwner(userId)) {
       return;
     }
+    if (this.ratelimitTimeout.hasStarted) {
+      return;
+    }
 
     try {
       switch (reaction.emoji.endpointFormat) {
@@ -318,9 +321,9 @@ export class Paginator {
           if (!this.custom.message) {
             await this.clearCustomMessage();
             this.custom.message = await this.message.reply('What page would you like to go to?');
-            this.custom.timeout = setTimeout(async () => {
+            this.custom.timeout.start(this.custom.expire, async () => {
               await this.clearCustomMessage();
-            }, this.custom.expire);
+            });
           }
         }; break;
         case this.emojis.stop.endpointFormat: {
@@ -338,6 +341,8 @@ export class Paginator {
         };
       }
 
+      this.timeout.start(this.expires, this.onStop.bind(this));
+      this.ratelimitTimeout.start(this.ratelimit, () => {});
       if (this.message.canDelete) {
         await reaction.delete(userId);
       }
@@ -391,14 +396,9 @@ export class Paginator {
         this.callbacks[callback] = null;
       }
     }
-    if (this.timeout !== null) {
-      clearTimeout(this.timeout);
-      this.timeout = null;
-    }
-    if (this.custom.timeout !== null) {
-      clearTimeout(this.custom.timeout);
-      this.custom.timeout = null;
-    }
+    this.timeout.stop();
+    this.custom.timeout.stop();
+    this.ratelimitTimeout.stop();
   }
 
   async start() {
@@ -410,7 +410,11 @@ export class Paginator {
         throw new Error('Cannot create messages in this channel');
       }
       const embed = await this.getPage(this.page);
-      this.message = await this.context.reply({embed: <any> embed});
+      if (this.context instanceof Command.Context) {
+        this.message = await this.context.editOrReply({embed: <any> embed});
+      } else {
+        this.message = await this.context.reply({embed: <any> embed});
+      }
     }
 
     this.reset();
@@ -428,7 +432,7 @@ export class Paginator {
         }
       }
 
-      this.timeout = setTimeout(this.onStop.bind(this), this.expires);
+      this.timeout.start(this.expires, this.onStop.bind(this));
       try {
         if (this.isLarge) {
           await this.message.react(this.emojis.previousDouble.endpointFormat);

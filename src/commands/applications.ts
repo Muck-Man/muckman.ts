@@ -20,13 +20,13 @@ export default (<Command.CommandOptions> {
     const channel = context.channel;
     return (channel) ? channel.canEmbedLinks : false;
   },
-  onCancel: (context) => context.reply('⚠ Unable to embed information in this channel.'),
+  onCancel: (context) => context.editOrReply('⚠ Unable to embed information in this channel.'),
   onBeforeRun: (context, args) => !!(args.applications && args.applications.length),
   onCancelRun: (context, args) => {
     if (args.applications) {
-      return context.reply('⚠ Unable to find that game.');
+      return context.editOrReply('⚠ Unable to find that game.');
     } else {
-      return context.reply('⚠ Provide some kind of game name.');
+      return context.editOrReply('⚠ Provide some kind of game name.');
     }
   },
   run: async (context, args) => {

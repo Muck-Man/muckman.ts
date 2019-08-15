@@ -24,9 +24,9 @@ export default (<Command.CommandOptions> {
     const channel = context.channel;
     return (channel) ? channel.canEmbedLinks : false;
   },
-  onCancel: (context) => context.reply('⚠ Unable to embed information in this channel.'),
+  onCancel: (context) => context.editOrReply('⚠ Unable to embed information in this channel.'),
   onBeforeRun: (context, args) => !!args.user,
-  onCancelRun: (context) => context.reply('⚠ Unable to find that guy.'),
+  onCancelRun: (context) => context.editOrReply('⚠ Unable to find that guy.'),
   run: async (context, args) => {
     const isMember = (args.user instanceof Structures.Member);
     const member = <Structures.Member> args.user;

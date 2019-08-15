@@ -9,6 +9,6 @@ export default (<Command.CommandOptions> {
     type: 'guild',
   },
   run: (context) => {
-    return context.reply('**Muck Man** <https://muck.gg>');
+    return context.editOrReply('**Muck Man** <https://muck.gg>');
   },
 });
