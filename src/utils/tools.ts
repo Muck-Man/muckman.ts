@@ -40,8 +40,8 @@ export async function findMembers(
         let matches = false;
         if (options.query) {
           matches = event.members.every((member: Structures.Member) => {
-            return [member.nick, member.username,].some((name) => {
-              return name && name.toLowerCase().startsWith(<string> options.query);
+            return member.names.some((name) => {
+              return name.toLowerCase().startsWith(<string> options.query);
             });
           });
         } else if (options.userIds) {
@@ -96,11 +96,8 @@ export function findMemberByUsername(
 ): Structures.Member | Structures.User | undefined {
   return members.find((member) => {
     if (member) {
-      const match = [
-        (member instanceof Structures.Member) ? member.nick : null,
-        member.username,
-      ].some((name) => {
-        return name && name.toLowerCase().startsWith(username);
+      const match = member.names.some((name) => {
+        return name.toLowerCase().startsWith(username);
       });
       if (match) {
         return (discriminator) ? member.discriminator === discriminator : true;

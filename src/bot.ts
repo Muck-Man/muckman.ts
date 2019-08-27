@@ -19,6 +19,9 @@ const muckMan = new MuckMan({
   },
   directory: './commands',
   gateway: {
+    identifyProperties: {
+      $browser: 'Discord iOS',
+    },
     presence: {
       activity: {
         name: 'for muck',
